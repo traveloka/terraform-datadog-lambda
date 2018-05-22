@@ -10,7 +10,7 @@ Usage
 
 ```hcl
 module "timeboard_lambda_beical-function" {
-  source         = "github.com/traveloka/terraform-datadog-lambda.git//timeboard"
+  source         = "github.com/traveloka/terraform-datadog-lambda//timeboard"
   product_domain = "BEI"
   function_name  = "beical-function"
 }
