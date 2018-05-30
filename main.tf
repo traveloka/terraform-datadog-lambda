@@ -1,4 +1,10 @@
+locals {
+  monitor_enabled = "${var.enabled && length(var.recipients) > 0 ? 1 : 0}"
+}
+
 resource "datadog_timeboard" "lambda" {
+  count = "${var.enabled}"
+
   title       = "${var.product_domain} - ${var.function_name} - Lambda"
   description = "A generated timeboard for Lambda"
 
@@ -8,28 +14,34 @@ resource "datadog_timeboard" "lambda" {
     prefix  = "functionname"
   }
 
+  template_variable {
+    default = "${var.environment}"
+    name    = "environment"
+    prefix  = "environment"
+  }
+
   graph {
     title     = "Duration"
     viz       = "timeseries"
     autoscale = true
 
     request {
-      q    = "avg:aws.lambda.duration{$function_name} by {functionname}"
+      q    = "avg:aws.lambda.duration{$function_name, $environment} by {functionname}"
       type = "line"
     }
 
     request {
-      q    = "avg:aws.lambda.duration.sum{$function_name} by {functionname}"
+      q    = "avg:aws.lambda.duration.sum{$function_name, $environment} by {functionname}"
       type = "line"
     }
 
     request {
-      q    = "avg:aws.lambda.duration.maximum{$function_name} by {functionname}"
+      q    = "avg:aws.lambda.duration.maximum{$function_name, $environment} by {functionname}"
       type = "line"
     }
 
     request {
-      q    = "avg:aws.lambda.duration.minimum{$function_name} by {functionname}"
+      q    = "avg:aws.lambda.duration.minimum{$function_name, $environment} by {functionname}"
       type = "line"
     }
   }
@@ -40,7 +52,7 @@ resource "datadog_timeboard" "lambda" {
     autoscale = true
 
     request {
-      q    = "avg:aws.lambda.errors{$function_name} by {functionname}.as_count()"
+      q    = "avg:aws.lambda.errors{$function_name, $environment} by {functionname}.as_count()"
       type = "area"
     }
   }
@@ -51,7 +63,7 @@ resource "datadog_timeboard" "lambda" {
     autoscale = true
 
     request {
-      q    = "avg:aws.lambda.invocations{$function_name} by {functionname}.as_count()"
+      q    = "avg:aws.lambda.invocations{$function_name, $environment} by {functionname}.as_count()"
       type = "area"
     }
   }
@@ -62,7 +74,7 @@ resource "datadog_timeboard" "lambda" {
     autoscale = true
 
     request {
-      q    = "avg:aws.lambda.throttles{$function_name} by {functionname}.as_count()"
+      q    = "avg:aws.lambda.throttles{$function_name, $environment} by {functionname}.as_count()"
       type = "area"
     }
   }
