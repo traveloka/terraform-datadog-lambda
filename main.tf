@@ -3,7 +3,7 @@ locals {
 }
 
 resource "datadog_timeboard" "lambda" {
-  count = "${var.enabled}"
+  count = "${var.enabled ? 1 : 0}"
 
   title       = "${var.product_domain} - ${var.function_name} - Lambda"
   description = "A generated timeboard for Lambda"
